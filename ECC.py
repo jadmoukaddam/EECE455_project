@@ -66,17 +66,6 @@ class ECC:
                 temp = self.sum(point, temp)
             return temp
     
-    def check_generator(self, point):
-        temp = point
-        for i in range(0, self.n):
-            print("Checking: ", temp)
-            if temp.x == 0 and temp.y == 0:
-                return False
-            temp = self.sum(point, temp)
-        if temp.x == 0 and temp.y == 0:
-            return True
-        print("Not a generator: ", temp)
-        return False
     
     def get_inverse(self, point):
         return Point(point.x, -point.y)
@@ -85,4 +74,17 @@ def find_Modular_Inverse(a, m):
     if gcd(a, m) != 1:
         return 0
     else:
-        return pow(a, -1, m)
+        return extendedEuclid(a, m)
+
+def extendedEuclid(inverse, mod):
+    A=(1,0,mod)
+    B=(0,1,inverse%mod)
+    while True:
+        if B[2]==0:
+            return False
+        if B[2]==1:
+            return B[1]
+        Q=A[2]//B[2]
+        C=((A[0]-Q*B[0])%mod,(A[1]-Q*B[1])%mod,(A[2]-Q*B[2])%mod)
+        A=B
+        B=C
