@@ -15,10 +15,8 @@ class ECC:
         self.G = G
         self.points = []
         self.points.append(Point(0, 0))
+        self.order = self.get_num_points()
     
-    def add_point(self, x, y):
-        self.points.append(Point(x, y))
-
     def get_num_points(self):
         points = []
         for y in range(self.n):

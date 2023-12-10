@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ECDSA Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .curve-info {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .curve-info2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #666;
+        }
+        input[type="text"],
+        button {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .button-group button {
+            flex: 1;
+            margin-right: 5px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns with equal width */
+            gap: 20px; /* Gap between columns */
+        }
+    </style>
+</head>
+<body>
+    <header>
+<h1></h1>
+    </header>
+    <h1>ECDSA</h1>
+    <div class="container">
+        <div class="column">
+            <div class="curve-info">
+                <p>Curve Equation: y<sup>2</sup> = x<sup>3</sup> + ax + b</p>
+                <p>Modulo:</p>
+                <p>Base Point (X, Y): (,)</p>
+                <p>Hash of Message:</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="curve-info2">
+                <p>Private Key (d):</p>
+                <p>Public Key (X, Y): (,)</p>
+                <p>Random Number (k):</p>
+                <p>Signature (r, s): (,)</p>
+            </div>
+        </div>
+    </div>
+    <button id="toggleButton">Toggle Sign/Verify</button>
+    <form id="ecdsaForm" action="/api" method="post">
+        <label for="a">a:</label>
+        <input type="text" id="a" name="a" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="b">b:</label>
+        <input type="text" id="b" name="b" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="modulo">Modulo:</label>
+        <input type="text" id="modulo" name="modulo" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="hash">Hash:</label>
+        <input type="text" id="hash" name="hash" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="basePointX">Base Point X Coordinate:</label>
+        <input type="text" id="basePointX" name="basePointX" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="basePointY">Base Point Y Coordinate:</label>
+        <input type="text" id="basePointY" name="basePointY" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="d">Private Key (d):</label>
+        <input type="text" id="d" name="d" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="k">Random Number (k):</label>
+        <input type="text" id="k" name="k" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+
+        <label for="publicKeyX">Public Key X Coordinate:</label>
+        <input type="text" id="publicKeyX" name="publicKeyX" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))" disabled="true">
+
+        <label for="publicKeyY">Public Key Y Coordinate:</label>
+        <input type="text" id="publicKeyY" name="publicKeyY" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))" disabled="true">
+
+        <label for="r">Signature (r):</label>
+        <input type="text" id="r" name="r" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"disabled="true">
+
+        <label for="s">Signature (s):</label>
+        <input type="text" id="s" name="s" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))" disabled="true">
+
+        <div class="button-group">
+            <button type="submit" name="action" value="sign" id="sign">Sign Hash</button>
+            <button type="submit" name="action" value="verify" id="verify" style="display: none" disabled = "true">Verify Signature</button>
+        </div>
+    </form>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleButton = document.getElementById("toggleButton");
+            const d = document.getElementById("d");
+            const k = document.getElementById("k");
+            const publicKeyX = document.getElementById("publicKeyX");
+            const publicKeyY = document.getElementById("publicKeyY");
+            const r = document.getElementById("r");
+            const s = document.getElementById("s");
+            const sign = document.getElementById("sign");
+            const verify = document.getElementById("verify");
+
+            toggleButton.addEventListener("click", function () {
+                // Toggle hide/show for the button
+                sign.style.display = sign.style.display === "none" ? "block" : "none";
+                verify.style.display = verify.style.display === "none" ? "block" : "none";
+                sign.disabled = !sign.disabled;
+                verify.disabled = !verify.disabled;
+                // Toggle disable/enable for the text fields
+                d.disabled = !d.disabled;
+                k.disabled = !k.disabled;
+                r.disabled = !r.disabled;
+                s.disabled = !s.disabled;
+                publicKeyX.disabled = !publicKeyX.disabled;
+                publicKeyY.disabled = !publicKeyY.disabled;
+            });
+
+
+
+            // Function to update curve parameters based on form values
+            function updateCurveParameters() {
+                const a = document.getElementById("a").value;
+                const b = document.getElementById("b").value;
+                const basePointX = document.getElementById("basePointX").value;
+                const basePointY = document.getElementById("basePointY").value;
+
+
+                // Update displayed parameters
+                document.querySelector(".curve-info > p:nth-child(1)").innerHTML = `Curve Equation: y<sup>2</sup> = x<sup>3</sup> + ${a || '0'}x + ${b || '0'}`;
+                document.querySelector(".curve-info > p:nth-child(2)").innerHTML = `Modulo: ${modulo.value || '0'}`;
+                document.querySelector(".curve-info > p:nth-child(3)").innerHTML = `Base Point (X, Y): (${basePointX}, ${basePointY})`;
+                document.querySelector(".curve-info > p:nth-child(4)").innerHTML = `Hash of Message: ${hash.value || '0'}`;
+                document.querySelector(".curve-info2 > p:nth-child(1)").innerHTML = `Private Key (d): ${d.value}`;
+                document.querySelector(".curve-info2 > p:nth-child(2)").innerHTML = `Public Key (X, Y): (${publicKeyX.value }, ${publicKeyY.value})`;
+                document.querySelector(".curve-info2 > p:nth-child(3)").innerHTML = `Random Number (k): ${k.value}`;
+                document.querySelector(".curve-info2 > p:nth-child(4)").innerHTML = `Signature (r, s): (${r.value}, ${s.value})`;
+
+                // Add/update more parameters if needed
+            }
+
+            // Function to handle form submission
+            document.getElementById("ecdsaForm").addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent default form submission
+                // Determine the form action based on the button clicked
+                const action = event.submitter.value;
+                let formAction = "";
+
+                if (action === "sign") {
+                    formAction = "/api/sign"; // Change this to the appropriate endpoint for signing
+                } else if (action === "verify") {
+                    formAction = "/api/verify"; // Change this to the appropriate endpoint for verification
+                }
+
+                // Set the form action and submit the form
+                //document.getElementById("ecdsaForm").action = formAction;
+                const jsonData = {};
+                const formData = new FormData(this);
+                // Convert FormData to JSON
+                formData.forEach(function(value, key) {
+                    jsonData[key] = value;
+                });
+                console.log(jsonData);
+                console.log(formData)
+                fetch(formAction, {
+                method: this.method,
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+                })
+                .then(response => {
+                    console.log(response);
+                    return response.json(); // Parse JSON response
+                })
+                .then(data => {
+                    if (data.error !== undefined) {
+                        alert(data.error);
+                        return;
+                    }
+                    document.getElementById("publicKeyX").value = data.publicKeyX;
+                    document.getElementById("publicKeyY").value = data.publicKeyY;
+                    document.getElementById("r").value = data.r;
+                    document.getElementById("s").value = data.s;
+                    document.getElementById("d").value = data.d || "";
+                    document.getElementById("k").value = data.k || "";
+                    updateCurveParameters();
+                    if (data.verified !== undefined){
+                        if (data.verified) {
+                            alert("Signature verified successfully!");
+                        } else {
+                            alert("Signature verification failed!");
+                        }
+                    }
+                })
+                .catch(error => {
+                    // Handle errors if any
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+            });
+
+            // Listen for changes in form inputs and update curve parameters
+            const formInputs = document.querySelectorAll("#ecdsaForm input[type='text']");
+            formInputs.forEach(function (input) {
+                input.addEventListener("input", updateCurveParameters);
+            });
+
+            // Update curve parameters initially
+            updateCurveParameters();
+        });
+    </script>
+</body>
+</html>

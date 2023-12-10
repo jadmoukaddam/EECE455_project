@@ -3,10 +3,13 @@ from Point import Point
 from random import randint
 
 class ECDSA():
-    def __init__(self, ECC, d):
+    def __init__(self, ECC, d, Q=None):
         self.ECC = ECC
         self.d = d
-        self.Q = ECC.multiply(ECC.G, d)
+        if Q != None:
+            self.Q = Q
+        else:
+            self.Q = ECC.multiply(ECC.G, d)
         self.order = ECC.get_num_points()
         print("Public Key: ", self.Q)
         print("Private Key: ", self.d)
@@ -18,20 +21,30 @@ class ECDSA():
     def get_s(self, hash, r, k):
         return (find_Modular_Inverse(k, self.order) * (hash + self.d * r)) % self.order
 
-    def sign(self, hash):
-        while True:
-            k = self.generate_k()
-            if extendedEuclid(k, self.order) == False:
-                continue
-            r = self.get_r( k)
-            if r == 0:
-                print("r = 0 with k = ", k)
-                continue
+    def sign(self, hash, k=None):
+        if k==None:
+            while True:
+                k = self.generate_k()
+                if extendedEuclid(k, self.order) == False:
+                    continue
+                r = self.get_r( k)
+                if r == 0:
+                    print("r = 0 with k = ", k)
+                    continue
+                s = self.get_s(hash, r, k)
+                if s == 0 or extendedEuclid(s, self.order) == False:
+                    print("s = 0 or s^-1 does not exist with k = ", k)
+                    continue
+                print("Generated K: ", k)
+                return r, s, k
+        else:
+            r = self.get_r(k)
             s = self.get_s(hash, r, k)
-            if s == 0 or extendedEuclid(s, self.order) == False:
-                print("s = 0 or s^-1 does not exist with k = ", k)
-                continue
-            print("Generated K: ", k)
+            if r == 0 or s == 0:
+                print("r = 0 or s = 0 with k = ", k)
+                raise Exception("r = 0 or s = 0 with k = ", k)
+            if extendedEuclid(s, self.order) == False:
+                raise Exception("s^-1 does not exist with k = ", k)
             return r, s
 
     def verify(self, hash, r, s):
@@ -58,6 +71,9 @@ class ECDSA():
     
     def generate_k(self):
         return randint(1, self.order - 1)
+    
+    def generate_private_key(order):
+        return randint(1, order - 1)
 
 def extendedEuclid(inverse, mod):
     A=(1,0,mod)
@@ -79,7 +95,7 @@ def main():
     curve = ECC(23, 1, 1, Point(7,11))
     d = 1
     ecdsa = ECDSA(curve, d)
-    r, s = ecdsa.sign(m)
+    r, s = ecdsa.sign(m, k=3)
     print(r, s)
     print(ecdsa.verify(m, r, s))
 
