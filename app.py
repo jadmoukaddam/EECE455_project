@@ -80,6 +80,9 @@ def get_signature():
         d = ECDSA.generate_private_key(curve.order)
     k=-1
     ecdsa = ECDSA(curve, d)
+    hash = int(request.get_json()['hash'])
+    if hash<0 or hash>curve.order:
+        return jsonify({'error': 'Invalid hash, should be between 1 and curve order - 1'}), 400
     try:
         k = int(request.get_json()['k'])
         if k<0 or k>curve.order:
@@ -120,6 +123,9 @@ def verify_signature():
     publicKeyY = int(request.get_json()['publicKeyY'])
     Q = Point(publicKeyX, publicKeyY)
     ecdsa = ECDSA(curve, 1, Q=Q)
+    hash = int(request.get_json()['hash'])
+    if hash<0 or hash>curve.order:
+        return jsonify({'error': 'Invalid hash, should be between 1 and curve order - 1'}), 400
     verified = ecdsa.verify(int(request.get_json()['hash']), r, s)
     print("Got request: ", request.get_json())
     return jsonify({'verified': verified, 'publicKeyX' : publicKeyX, 'publicKeyY' : publicKeyY, 'r' : r, 's' : s, 'k' : ''}), 200
