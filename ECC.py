@@ -2,7 +2,7 @@ from math import gcd
 from Point import Point
 class ECC:
     def __init__(self, n, a, b, G):
-        if 4 * pow(a, 3) + 27 * pow(b, 2) % n == 0:
+        if (4 * pow(a, 3) + 27 * pow(b, 2)) % n == 0:
             raise Exception("Invalid ECC parameters, 4a^3 + 27b^2 = 0")
         self.n = n
         self.a = a
@@ -12,10 +12,12 @@ class ECC:
         if G.y*G.y % n != (pow(G.x, 3) + a * G.x + b) % n or G.x >= n or G.y >= n or G.x < 0 or G.y < 0:
             raise Exception("Invalid ECC parameters, G is not on the curve")
         
+        
         self.G = G
         self.points = []
         self.points.append(Point(0, 0))
-        self.order = self.get_num_points()
+        self.order = self.get_order()
+    
     
     def get_num_points(self):
         points = []
@@ -67,6 +69,14 @@ class ECC:
     
     def get_inverse(self, point):
         return Point(point.x, -point.y)
+    
+    def get_order(self):
+        order = 0
+        temp = self.G
+        while temp.x != 0 or temp.y != 0:
+            order += 1
+            temp = self.sum(temp, self.G)
+        return order + 1
 
 def find_Modular_Inverse(a, m):
     if gcd(a, m) != 1:

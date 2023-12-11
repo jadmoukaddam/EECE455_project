@@ -10,7 +10,7 @@ class ECDSA():
             self.Q = Q
         else:
             self.Q = ECC.multiply(ECC.G, d)
-        self.order = ECC.get_num_points()
+        self.order = ECC.get_order()
         print("Public Key: ", self.Q)
         print("Private Key: ", self.d)
         print("Order: ", self.order)
@@ -44,6 +44,7 @@ class ECDSA():
                 print("r = 0 or s = 0 with k = ", k)
                 raise Exception("r = 0 or s = 0 with k = ", k)
             if extendedEuclid(s, self.order) == False:
+                print(k, self.order, s)
                 raise Exception("s^-1 does not exist with k = ", k)
             return r, s
 
@@ -57,6 +58,7 @@ class ECDSA():
         print("u1: ", u1)
         print("u2: ", u2)
         print("u1xG: ", self.ECC.multiply(self.ECC.G, u1))
+        print("Q: ", self.Q)
         print("u2xQ: ", self.ECC.multiply(self.Q, u2))
         P = self.ECC.sum(self.ECC.multiply(self.ECC.G, u1), self.ECC.multiply(self.Q, u2))
         print("P: ", P)
@@ -97,6 +99,13 @@ def main():
     ecdsa = ECDSA(curve, d)
     r, s = ecdsa.sign(m, k=3)
     print(r, s)
+    print(ecdsa.verify(m, r, s))
+
+    d = 2
+    ecdsa = ECDSA(curve, 2, Q=Point(17, 20))
+    r,s = ecdsa.sign(m, k=9)
+    print(r, s)
+    ecdsa = ECDSA(curve, 1, Q=Point(17, 20))
     print(ecdsa.verify(m, r, s))
 
 if __name__ == "__main__":

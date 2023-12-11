@@ -67,7 +67,10 @@ def get_signature():
     b = int(request.get_json()['b'])
     basePointX = int(request.get_json()['basePointX'])
     basePointY = int(request.get_json()['basePointY'])
-    curve = ECC(modulo, a, b, Point(basePointX, basePointY))
+    try:
+        curve = ECC(modulo, a, b, Point(basePointX, basePointY))
+    except:
+        return jsonify({'error': 'Invalid curve parameters, 4a^3 + 27b^2 mod n = 0 or G not on the curve'}), 400
     d = 1
     try:
         d = int(request.get_json()['d'])
@@ -105,14 +108,20 @@ def verify_signature():
     b = int(request.get_json()['b'])
     basePointX = int(request.get_json()['basePointX'])
     basePointY = int(request.get_json()['basePointY'])
-    curve = ECC(modulo, a, b, Point(basePointX, basePointY))
+    curve = None
+    try:
+        curve = ECC(modulo, a, b, Point(basePointX, basePointY))
+    except Exception as e:
+        return jsonify({'error': 'Invalid curve parameters, 4a^3 + 27b^2 mod n = 0 or G not on the curve'}), 400
+
     r = int(request.get_json()['r'])
     s = int(request.get_json()['s'])
     publicKeyX = int(request.get_json()['publicKeyX'])
     publicKeyY = int(request.get_json()['publicKeyY'])
     Q = Point(publicKeyX, publicKeyY)
-    ecdsa = ECDSA(curve, 1)
+    ecdsa = ECDSA(curve, 1, Q=Q)
     verified = ecdsa.verify(int(request.get_json()['hash']), r, s)
+    print("Got request: ", request.get_json())
     return jsonify({'verified': verified, 'publicKeyX' : publicKeyX, 'publicKeyY' : publicKeyY, 'r' : r, 's' : s, 'k' : ''}), 200
 
 
