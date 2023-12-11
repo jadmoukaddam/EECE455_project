@@ -23,8 +23,12 @@ class ECDSA():
 
     def sign(self, hash, k=None):
         if k==None:
+            counter = 0
             while True:
+                counter += 1
                 k = self.generate_k()
+                if counter > 100:
+                    raise InterruptedError("Could not generate k in 100 tries")
                 if extendedEuclid(k, self.order) == False:
                     continue
                 r = self.get_r( k)

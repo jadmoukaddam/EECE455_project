@@ -34,7 +34,6 @@ def check_ECC_params(sign_data):
     return True
 
 def check_verify_params(sign_data):
-    print("here")
     try:
         sign_data["r"]
         sign_data["s"]
@@ -91,7 +90,10 @@ def get_signature():
         pass
     r,s = (-1,-1)
     if k==-1:
-        r,s, k = ecdsa.sign(int(request.get_json()['hash']))
+        try:
+            r,s, k = ecdsa.sign(int(request.get_json()['hash']))
+        except:
+            return jsonify({'error': 'Could not generate k within 100 tries'}), 400
     else:
         try:
             r,s = ecdsa.sign(int(request.get_json()['hash']), k)
