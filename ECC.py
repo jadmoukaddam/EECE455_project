@@ -84,6 +84,11 @@ def find_Modular_Inverse(a, m):
     else:
         return extendedEuclid(a, m)
 
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
 def extendedEuclid(inverse, mod):
     A=(1,0,mod)
     B=(0,1,inverse%mod)
