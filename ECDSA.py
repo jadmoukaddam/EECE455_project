@@ -57,6 +57,7 @@ class ECDSA():
             return False
         w = find_Modular_Inverse(s, self.order)
         print("w: ", w, "\ns: ", s, "\norder: ", self.order)
+        print("hash: ", hash, "\nr: ", r, "\nG: ", self.ECC.G)
         u1 = (hash * w) % self.order
         u2 = (r * w) % self.order
         print("u1: ", u1)
@@ -66,8 +67,8 @@ class ECDSA():
         print("u2xQ: ", self.ECC.multiply(self.Q, u2))
         P = self.ECC.sum(self.ECC.multiply(self.ECC.G, u1), self.ECC.multiply(self.Q, u2))
         print("P: ", P)
-        print("Expected r = ", r, "Actual r = ", P.x)
-        return r == P.x
+        print("Expected r = ", r, "Actual r = ", P.x % self.order)
+        return r == (P.x % self.order)
     
     def get_public_key(self):
         return self.Q
