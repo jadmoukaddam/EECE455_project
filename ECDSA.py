@@ -66,6 +66,8 @@ class ECDSA():
         print("Q: ", self.Q)
         print("u2xQ: ", self.ECC.multiply(self.Q, u2))
         P = self.ECC.sum(self.ECC.multiply(self.ECC.G, u1), self.ECC.multiply(self.Q, u2))
+        if P.x == 0 and P.y == 0:
+            return False
         print("P: ", P)
         print("Expected r = ", r, "Actual r = ", P.x % self.order)
         return r == (P.x % self.order)
